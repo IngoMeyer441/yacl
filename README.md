@@ -52,7 +52,7 @@ def my_func():
 
 You will get an output like:
 
-![screenshot_simple](https://github.com/IngoHeimbach/yacl/blob/master/simple.png)
+![screenshot_simple](https://raw.githubusercontent.com/IngoHeimbach/yacl/master/simple.png)
 
 This example only works if you don't attach any output handlers to loggers other than the root logger as recommended in
 the [Python logging documentation](https://docs.python.org/3/library/logging.html):
