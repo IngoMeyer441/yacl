@@ -99,12 +99,12 @@ You can pass several arguments to the `setup_colored_stderr_logging` function to
   from yacl import TerminalColorCodes
 
   keyword_colors = {
-      r"critical( error)?": TerminalColorCodes.RED + TerminalColorCodes.BLINK + TerminalColorCodes.BOLD,
-      r"debug(ged|ging)?": TerminalColorCodes.GREEN + TerminalColorCodes.BOLD,
-      r"error": TerminalColorCodes.RED + TerminalColorCodes.BOLD,
-      r"fail(ed|ing)?": TerminalColorCodes.RED + TerminalColorCodes.BOLD,
-      r"info": TerminalColorCodes.BLUE + TerminalColorCodes.BOLD,
-      r"warn(ed|ing)?": TerminalColorCodes.YELLOW + TerminalColorCodes.BOLD,
+      r"\bcritical( error)?\b": TerminalColorCodes.RED + TerminalColorCodes.BLINK + TerminalColorCodes.BOLD,
+      r"\bdebug(ged|ging)?\b": TerminalColorCodes.GREEN + TerminalColorCodes.BOLD,
+      r"\berror\b": TerminalColorCodes.RED + TerminalColorCodes.BOLD,
+      r"\bfail(ed|ing)?\b": TerminalColorCodes.RED + TerminalColorCodes.BOLD,
+      r"\binfo\b": TerminalColorCodes.BLUE + TerminalColorCodes.BOLD,
+      r"\bwarn(ed|ing)?\b": TerminalColorCodes.YELLOW + TerminalColorCodes.BOLD,
       r'"[^"]*"': TerminalColorCodes.YELLOW,
   }
   ```
