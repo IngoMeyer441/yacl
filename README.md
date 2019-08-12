@@ -67,7 +67,7 @@ the [Python logging documentation](https://docs.python.org/3/library/logging.htm
 
 You can pass several arguments to the `setup_colored_stderr_logging` function to customize the logging behavior:
 
-- `logger`: The logger which will be configured to print colored logging output to stderr. By default, the roor logger
+- `logger`: The logger which will be configured to print colored logging output to stderr. By default, the root logger
   is used.
 
 - `format_string`: The format string to use for logging messages. By default the logging format
