@@ -21,7 +21,7 @@ python3 -m pip install yacl
 
 Call ``setup_colored_stderr_logging`` after the root logger has been set up, for example:
 
-```bash
+```python
 #!/usr/bin/env python3
 
 import logging
