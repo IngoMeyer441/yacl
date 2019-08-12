@@ -9,7 +9,7 @@ __author__ = "Ingo Heimbach"
 __email__ = "i.heimbach@fz-juelich.de"
 __copyright__ = "Copyright © 2019 Forschungszentrum Jülich GmbH. All rights reserved."
 __license__ = "MIT"
-__version_info__ = (0, 1, 2)
+__version_info__ = (0, 1, 3)
 __version__ = ".".join(map(str, __version_info__))
 
 
@@ -38,12 +38,12 @@ class ColoredFormatter(logging.Formatter):
         "name": TerminalColorCodes.CYAN,
     }
     _keyword_colors = {
-        r"critical( error)?": TerminalColorCodes.RED + TerminalColorCodes.BLINK + TerminalColorCodes.BOLD,
-        r"debug(ged|ging)?": TerminalColorCodes.GREEN + TerminalColorCodes.BOLD,
-        r"error": TerminalColorCodes.RED + TerminalColorCodes.BOLD,
-        r"fail(ed|ing)?": TerminalColorCodes.RED + TerminalColorCodes.BOLD,
-        r"info": TerminalColorCodes.BLUE + TerminalColorCodes.BOLD,
-        r"warn(ed|ing)?": TerminalColorCodes.YELLOW + TerminalColorCodes.BOLD,
+        r"\bcritical( error)?\b": TerminalColorCodes.RED + TerminalColorCodes.BLINK + TerminalColorCodes.BOLD,
+        r"\bdebug(ged|ging)?\b": TerminalColorCodes.GREEN + TerminalColorCodes.BOLD,
+        r"\berror\b": TerminalColorCodes.RED + TerminalColorCodes.BOLD,
+        r"\bfail(ed|ing)?\b": TerminalColorCodes.RED + TerminalColorCodes.BOLD,
+        r"\binfo\b": TerminalColorCodes.BLUE + TerminalColorCodes.BOLD,
+        r"\bwarn(ed|ing)?\b": TerminalColorCodes.YELLOW + TerminalColorCodes.BOLD,
         r'"[^"]*"': TerminalColorCodes.YELLOW,
     }
     _level_colors = {

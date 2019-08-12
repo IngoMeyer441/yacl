@@ -67,7 +67,7 @@ the [Python logging documentation](https://docs.python.org/3/library/logging.htm
 
 You can pass several arguments to the `setup_colored_stderr_logging` function to customize the logging behavior:
 
-- `logger`: The logger which will be configured to print colored logging output to stderr. By default, the roor logger
+- `logger`: The logger which will be configured to print colored logging output to stderr. By default, the root logger
   is used.
 
 - `format_string`: The format string to use for logging messages. By default the logging format
@@ -99,12 +99,12 @@ You can pass several arguments to the `setup_colored_stderr_logging` function to
   from yacl import TerminalColorCodes
 
   keyword_colors = {
-      r"critical( error)?": TerminalColorCodes.RED + TerminalColorCodes.BLINK + TerminalColorCodes.BOLD,
-      r"debug(ged|ging)?": TerminalColorCodes.GREEN + TerminalColorCodes.BOLD,
-      r"error": TerminalColorCodes.RED + TerminalColorCodes.BOLD,
-      r"fail(ed|ing)?": TerminalColorCodes.RED + TerminalColorCodes.BOLD,
-      r"info": TerminalColorCodes.BLUE + TerminalColorCodes.BOLD,
-      r"warn(ed|ing)?": TerminalColorCodes.YELLOW + TerminalColorCodes.BOLD,
+      r"\bcritical( error)?\b": TerminalColorCodes.RED + TerminalColorCodes.BLINK + TerminalColorCodes.BOLD,
+      r"\bdebug(ged|ging)?\b": TerminalColorCodes.GREEN + TerminalColorCodes.BOLD,
+      r"\berror\b": TerminalColorCodes.RED + TerminalColorCodes.BOLD,
+      r"\bfail(ed|ing)?\b": TerminalColorCodes.RED + TerminalColorCodes.BOLD,
+      r"\binfo\b": TerminalColorCodes.BLUE + TerminalColorCodes.BOLD,
+      r"\bwarn(ed|ing)?\b": TerminalColorCodes.YELLOW + TerminalColorCodes.BOLD,
       r'"[^"]*"': TerminalColorCodes.YELLOW,
   }
   ```
