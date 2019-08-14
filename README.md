@@ -4,8 +4,12 @@
 
 YACL is a very simple to use color logger for Python intended to be used for stderr logging. It can be set up with a
 single function call in existing projects and enables colored logging output with reasonable defaults. Colors are
-disabled automatically if stderr is not connected to a tty (e.g. on file redirection). Currently, Linux and macOS are
-supported.
+disabled automatically if stderr is not connected to a tty (e.g. on file redirection) or if not supported by the
+connected terminal. Currently, Linux and macOS are supported.
+
+You can use Markdown style formattings to produce bold and italic text. Additionally, text enclosed in double
+underscores will be displayed underlined. YACL checks the terminal capabilities and automatically disables unsupported
+formats.
 
 ## Installation
 
@@ -85,10 +89,10 @@ You can pass several arguments to the `setup_colored_stderr_logging` function to
   ```python
   from yacl import TerminalColorCodes
 
-  attribute_colors = {
-      "funcName": TerminalColorCodes.BLUE,
-      "lineno": TerminalColorCodes.YELLOW,
-      "name": TerminalColorCodes.CYAN,
+  _attribute_colors = {
+      "funcName": TerminalColorCodes.blue,
+      "lineno": TerminalColorCodes.yellow,
+      "name": TerminalColorCodes.cyan,
   }
   ```
 
@@ -99,13 +103,17 @@ You can pass several arguments to the `setup_colored_stderr_logging` function to
   from yacl import TerminalColorCodes
 
   keyword_colors = {
-      r"\bcritical( error)?\b": TerminalColorCodes.RED + TerminalColorCodes.BLINK + TerminalColorCodes.BOLD,
-      r"\bdebug(ged|ging)?\b": TerminalColorCodes.GREEN + TerminalColorCodes.BOLD,
-      r"\berror\b": TerminalColorCodes.RED + TerminalColorCodes.BOLD,
-      r"\bfail(ed|ing)?\b": TerminalColorCodes.RED + TerminalColorCodes.BOLD,
-      r"\binfo\b": TerminalColorCodes.BLUE + TerminalColorCodes.BOLD,
-      r"\bwarn(ed|ing)?\b": TerminalColorCodes.YELLOW + TerminalColorCodes.BOLD,
-      r'"[^"]*"': TerminalColorCodes.YELLOW,
+      r"\bcritical( error)?\b": TerminalColorCodes.red + TerminalColorCodes.blink + TerminalColorCodes.bold,
+      r"\bdebug(ged|ging)?\b": TerminalColorCodes.green + TerminalColorCodes.bold,
+      r"\berror\b": TerminalColorCodes.red + TerminalColorCodes.bold,
+      r"\bfail(ed|ing)?\b": TerminalColorCodes.red + TerminalColorCodes.bold,
+      r"\binfo\b": TerminalColorCodes.blue + TerminalColorCodes.bold,
+      r"\bwarn(ed|ing)?\b": TerminalColorCodes.yellow + TerminalColorCodes.bold,
+      r'"[^"]*"': TerminalColorCodes.yellow,
+      r"\*([^*]+)\*": TerminalColorCodes.italics,
+      r"\*\*([^*]+)\*\*": TerminalColorCodes.bold,
+      r"__([^_]+)__": TerminalColorCodes.underline,
+      r"`([^`]+)`": TerminalColorCodes.standout,
   }
   ```
 
@@ -113,11 +121,11 @@ You can pass several arguments to the `setup_colored_stderr_logging` function to
 
   ```python
   {
-      r"'[^']*'": TerminalColorCodes.GREEN,
+      r"'[^']*'": TerminalColorCodes.green + TerminalColorCodes.italics,
   }
   ```
 
-  to highlight strings in single quotes with green color.
+  to highlight strings in single quotes with green color and italic font (if supported by the Terminal).
 
 - `level_colors`: A dictionary which assigns colors to logging levels (DEBUG, INFO, ...). This dictionary is merged with
   the internal defaults:
@@ -126,10 +134,10 @@ You can pass several arguments to the `setup_colored_stderr_logging` function to
   from yacl import TerminalColorCodes
 
   level_colors = {
-      "DEBUG": TerminalColorCodes.GREEN + TerminalColorCodes.BOLD,
-      "INFO": TerminalColorCodes.BLUE + TerminalColorCodes.BOLD,
-      "WARNING": TerminalColorCodes.YELLOW + TerminalColorCodes.BOLD,
-      "ERROR": TerminalColorCodes.RED + TerminalColorCodes.BOLD,
-      "CRITICAL": TerminalColorCodes.RED + TerminalColorCodes.BLINK + TerminalColorCodes.BOLD,
+      "DEBUG": TerminalColorCodes.green + TerminalColorCodes.bold,
+      "INFO": TerminalColorCodes.blue + TerminalColorCodes.bold,
+      "WARNING": TerminalColorCodes.yellow + TerminalColorCodes.bold,
+      "ERROR": TerminalColorCodes.red + TerminalColorCodes.bold,
+      "CRITICAL": TerminalColorCodes.red + TerminalColorCodes.blink + TerminalColorCodes.bold,
   }
   ```
