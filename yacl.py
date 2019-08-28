@@ -72,16 +72,16 @@ class _TerminalColorCodesMeta(type):
             return
         if not cls.is_stderr_tty():
             cls._codename_to_terminal_code = {key: "" for key in cls._codename_to_capname.keys()}
-            return
-        has_terminal_color = cls.has_terminal_color()
-        for codename in cls._codename_to_capname.keys():
-            if codename in cls._color_names and not has_terminal_color:
-                cls._codename_to_terminal_code[codename] = ""
-            else:
-                try:
-                    cls._codename_to_terminal_code[codename] = cls._query_terminfo_database(codename)
-                except subprocess.CalledProcessError:
+        else:
+            has_terminal_color = cls.has_terminal_color()
+            for codename in cls._codename_to_capname.keys():
+                if codename in cls._color_names and not has_terminal_color:
                     cls._codename_to_terminal_code[codename] = ""
+                else:
+                    try:
+                        cls._codename_to_terminal_code[codename] = cls._query_terminfo_database(codename)
+                    except subprocess.CalledProcessError:
+                        cls._codename_to_terminal_code[codename] = ""
         cls._initialized_terminal_codes = True
 
     def _query_terminfo_database(cls, codename: str) -> str:
