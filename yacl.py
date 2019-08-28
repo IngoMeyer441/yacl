@@ -22,72 +22,66 @@ class _TerminalColorCodesMeta(type):
 
     def __init__(cls, name: str, bases: Tuple[type], nmspc: Dict[str, str]) -> None:
         super().__init__(name, bases, nmspc)
-        cls._initialized_terminal_codes = False
-        cls._codes = {
-            "black": "\033[30m",
-            "red": "\033[31m",
-            "green": "\033[32m",
-            "yellow": "\033[33m",
-            "blue": "\033[34m",
-            "purple": "\033[35m",
-            "cyan": "\033[36m",
-            "gray": "\033[37m",
-            "light_black": "\033[90m",
-            "light_red": "\033[91m",
-            "light_green": "\033[92m",
-            "light_yellow": "\033[93m",
-            "light_blue": "\033[94m",
-            "light_purple": "\033[95m",
-            "light_cyan": "\033[96m",
-            "white": "\033[97m",
-            "blink": None,
-            "bold": None,
-            "italics": None,
-            "underline": None,
-            "standout": None,
-            "reset": "\033[0m",
-        }
         cls._codename_to_capname = {
+            "black": "setaf 0",
+            "red": "setaf 1",
+            "green": "setaf 2",
+            "yellow": "setaf 3",
+            "blue": "setaf 4",
+            "purple": "setaf 5",
+            "cyan": "setaf 6",
+            "gray": "setaf 7",
+            "light_black": "setaf 8",
+            "light_red": "setaf 9",
+            "light_green": "setaf 10",
+            "light_yellow": "setaf 11",
+            "light_blue": "setaf 12",
+            "light_purple": "setaf 13",
+            "light_cyan": "setaf 14",
+            "white": "setaf 15",
             "blink": "blink",
             "bold": "bold",
             "italics": "sitm",
-            "underline": "smul",
             "standout": "smso",
+            "underline": "smul",
+            "reset": "sgr0",
         }
+        cls._color_names = (
+            "black",
+            "red",
+            "green",
+            "yellow",
+            "blue",
+            "purple",
+            "cyan",
+            "gray",
+            "light_black",
+            "light_red",
+            "light_green",
+            "light_yellow",
+            "light_blue",
+            "light_purple",
+            "light_cyan",
+            "white",
+        )
+        cls._codename_to_terminal_code = {}  # type: Dict[str, str]
+        cls._initialized_terminal_codes = False
 
     def _init_terminal_codes(cls) -> None:
         if cls._initialized_terminal_codes:
             return
         if not cls.is_stderr_tty():
-            for key, value in dict(cls._codes).items():
-                cls._codes[key] = ""
+            cls._codename_to_terminal_code = {key: "" for key in cls._codename_to_capname.keys()}
             return
-        if not cls.has_terminal_color():
-            for color_name in (
-                "black",
-                "red",
-                "green",
-                "yellow",
-                "blue",
-                "purple",
-                "cyan",
-                "gray",
-                "light_black",
-                "light_red",
-                "light_green",
-                "light_yellow",
-                "light_blue",
-                "light_purple",
-                "light_cyan",
-                "white",
-            ):
-                cls._codes[color_name] = ""
-        for key, value in dict(cls._codes).items():
-            if value is None:
+        has_terminal_color = cls.has_terminal_color()
+        for codename in cls._codename_to_capname.keys():
+            if codename in cls._color_names and not has_terminal_color:
+                cls._codename_to_terminal_code[codename] = ""
+            else:
                 try:
-                    cls._codes[key] = cls._query_terminfo_database(key)
+                    cls._codename_to_terminal_code[codename] = cls._query_terminfo_database(codename)
                 except subprocess.CalledProcessError:
-                    cls._codes[key] = ""
+                    cls._codename_to_terminal_code[codename] = ""
         cls._initialized_terminal_codes = True
 
     def _query_terminfo_database(cls, codename: str) -> str:
@@ -95,7 +89,7 @@ class _TerminalColorCodesMeta(type):
             capname = cls._codename_to_capname[codename]
         else:
             capname = codename
-        return str(subprocess.check_output(["tput", capname], universal_newlines=True))
+        return str(subprocess.check_output(["tput"] + capname.split(), universal_newlines=True))
 
     def is_stderr_tty(cls) -> bool:
         return os.isatty(sys.stderr.fileno())
@@ -109,134 +103,134 @@ class _TerminalColorCodesMeta(type):
     @property
     def black(cls) -> str:
         cls._init_terminal_codes()
-        assert cls._codes["black"] is not None
-        return cls._codes["black"]
+        assert cls._codename_to_terminal_code["black"] is not None
+        return cls._codename_to_terminal_code["black"]
 
     @property
     def red(cls) -> str:
         cls._init_terminal_codes()
-        assert cls._codes["red"] is not None
-        return cls._codes["red"]
+        assert cls._codename_to_terminal_code["red"] is not None
+        return cls._codename_to_terminal_code["red"]
 
     @property
     def green(cls) -> str:
         cls._init_terminal_codes()
-        assert cls._codes["green"] is not None
-        return cls._codes["green"]
+        assert cls._codename_to_terminal_code["green"] is not None
+        return cls._codename_to_terminal_code["green"]
 
     @property
     def yellow(cls) -> str:
         cls._init_terminal_codes()
-        assert cls._codes["yellow"] is not None
-        return cls._codes["yellow"]
+        assert cls._codename_to_terminal_code["yellow"] is not None
+        return cls._codename_to_terminal_code["yellow"]
 
     @property
     def blue(cls) -> str:
         cls._init_terminal_codes()
-        assert cls._codes["blue"] is not None
-        return cls._codes["blue"]
+        assert cls._codename_to_terminal_code["blue"] is not None
+        return cls._codename_to_terminal_code["blue"]
 
     @property
     def purple(cls) -> str:
         cls._init_terminal_codes()
-        assert cls._codes["purple"] is not None
-        return cls._codes["purple"]
+        assert cls._codename_to_terminal_code["purple"] is not None
+        return cls._codename_to_terminal_code["purple"]
 
     @property
     def cyan(cls) -> str:
         cls._init_terminal_codes()
-        assert cls._codes["cyan"] is not None
-        return cls._codes["cyan"]
+        assert cls._codename_to_terminal_code["cyan"] is not None
+        return cls._codename_to_terminal_code["cyan"]
 
     @property
     def gray(cls) -> str:
         cls._init_terminal_codes()
-        assert cls._codes["gray"] is not None
-        return cls._codes["gray"]
+        assert cls._codename_to_terminal_code["gray"] is not None
+        return cls._codename_to_terminal_code["gray"]
 
     @property
     def light_black(cls) -> str:
         cls._init_terminal_codes()
-        assert cls._codes["light_black"] is not None
-        return cls._codes["light_black"]
+        assert cls._codename_to_terminal_code["light_black"] is not None
+        return cls._codename_to_terminal_code["light_black"]
 
     @property
     def light_red(cls) -> str:
         cls._init_terminal_codes()
-        assert cls._codes["light_red"] is not None
-        return cls._codes["light_red"]
+        assert cls._codename_to_terminal_code["light_red"] is not None
+        return cls._codename_to_terminal_code["light_red"]
 
     @property
     def light_green(cls) -> str:
         cls._init_terminal_codes()
-        assert cls._codes["light_green"] is not None
-        return cls._codes["light_green"]
+        assert cls._codename_to_terminal_code["light_green"] is not None
+        return cls._codename_to_terminal_code["light_green"]
 
     @property
     def light_yellow(cls) -> str:
         cls._init_terminal_codes()
-        assert cls._codes["light_yellow"] is not None
-        return cls._codes["light_yellow"]
+        assert cls._codename_to_terminal_code["light_yellow"] is not None
+        return cls._codename_to_terminal_code["light_yellow"]
 
     @property
     def light_blue(cls) -> str:
         cls._init_terminal_codes()
-        assert cls._codes["light_blue"] is not None
-        return cls._codes["light_blue"]
+        assert cls._codename_to_terminal_code["light_blue"] is not None
+        return cls._codename_to_terminal_code["light_blue"]
 
     @property
     def light_purple(cls) -> str:
         cls._init_terminal_codes()
-        assert cls._codes["light_purple"] is not None
-        return cls._codes["light_purple"]
+        assert cls._codename_to_terminal_code["light_purple"] is not None
+        return cls._codename_to_terminal_code["light_purple"]
 
     @property
     def light_cyan(cls) -> str:
         cls._init_terminal_codes()
-        assert cls._codes["light_cyan"] is not None
-        return cls._codes["light_cyan"]
+        assert cls._codename_to_terminal_code["light_cyan"] is not None
+        return cls._codename_to_terminal_code["light_cyan"]
 
     @property
     def white(cls) -> str:
         cls._init_terminal_codes()
-        assert cls._codes["white"] is not None
-        return cls._codes["white"]
+        assert cls._codename_to_terminal_code["white"] is not None
+        return cls._codename_to_terminal_code["white"]
 
     @property
     def blink(cls) -> str:
         cls._init_terminal_codes()
-        assert cls._codes["blink"] is not None
-        return cls._codes["blink"]
+        assert cls._codename_to_terminal_code["blink"] is not None
+        return cls._codename_to_terminal_code["blink"]
 
     @property
     def bold(cls) -> str:
         cls._init_terminal_codes()
-        assert cls._codes["bold"] is not None
-        return cls._codes["bold"]
+        assert cls._codename_to_terminal_code["bold"] is not None
+        return cls._codename_to_terminal_code["bold"]
 
     @property
     def italics(cls) -> str:
         cls._init_terminal_codes()
-        assert cls._codes["italics"] is not None
-        return cls._codes["italics"]
+        assert cls._codename_to_terminal_code["italics"] is not None
+        return cls._codename_to_terminal_code["italics"]
 
     @property
     def underline(cls) -> str:
         cls._init_terminal_codes()
-        assert cls._codes["underline"] is not None
-        return cls._codes["underline"]
+        assert cls._codename_to_terminal_code["underline"] is not None
+        return cls._codename_to_terminal_code["underline"]
 
     @property
     def standout(cls) -> str:
         cls._init_terminal_codes()
-        assert cls._codes["standout"] is not None
-        return cls._codes["standout"]
+        assert cls._codename_to_terminal_code["standout"] is not None
+        return cls._codename_to_terminal_code["standout"]
 
     @property
     def reset(cls) -> str:
         cls._init_terminal_codes()
-        assert cls._codes["reset"] is not None
-        return cls._codes["reset"]
+        assert cls._codename_to_terminal_code["reset"] is not None
+        return cls._codename_to_terminal_code["reset"]
 
 
 class TerminalColorCodes(metaclass=_TerminalColorCodesMeta):
