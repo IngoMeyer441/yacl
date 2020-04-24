@@ -19,6 +19,13 @@ YACL is available on PyPI for Python 3.3+ and can be installed with `pip`:
 python3 -m pip install yacl
 ```
 
+If you use Arch Linux or one of its derivatives, you can also install `yacl` from the
+[AUR](https://aur.archlinux.org/packages/python-yacl/):
+
+```bash
+yay -S python-yacl
+```
+
 ## Usage
 
 ### Simple
