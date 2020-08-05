@@ -5,8 +5,8 @@ import subprocess
 import sys
 from typing import Dict, Match, Optional, Tuple
 
-__author__ = "Ingo Heimbach"
-__email__ = "i.heimbach@fz-juelich.de"
+__author__ = "Ingo Meyer"
+__email__ = "i.meyer@fz-juelich.de"
 __copyright__ = "Copyright © 2019 Forschungszentrum Jülich GmbH. All rights reserved."
 __license__ = "MIT"
 __version_info__ = (0, 3, 4)
