@@ -5,11 +5,11 @@ import subprocess
 import sys
 from typing import Dict, Match, Optional, Tuple
 
-__author__ = "Ingo Heimbach"
-__email__ = "i.heimbach@fz-juelich.de"
+__author__ = "Ingo Meyer"
+__email__ = "i.meyer@fz-juelich.de"
 __copyright__ = "Copyright © 2019 Forschungszentrum Jülich GmbH. All rights reserved."
 __license__ = "MIT"
-__version_info__ = (0, 3, 4)
+__version_info__ = (0, 3, 5)
 __version__ = ".".join(map(str, __version_info__))
 
 
@@ -244,12 +244,12 @@ class ColoredFormatter(logging.Formatter):
         "name": TerminalColorCodes.cyan,
     }
     _keyword_colors = {
-        r"\bcritical( error)?\b": TerminalColorCodes.red + TerminalColorCodes.blink + TerminalColorCodes.bold,
-        r"\bdebug(ged|ging)?\b": TerminalColorCodes.green + TerminalColorCodes.bold,
+        r"\bcritical(?: error)?\b": TerminalColorCodes.red + TerminalColorCodes.blink + TerminalColorCodes.bold,
+        r"\bdebug(?:ged|ging)?\b": TerminalColorCodes.green + TerminalColorCodes.bold,
         r"\berror\b": TerminalColorCodes.red + TerminalColorCodes.bold,
-        r"\bfail(ed|ing)?\b": TerminalColorCodes.red + TerminalColorCodes.bold,
+        r"\bfail(?:ed|ing)?\b": TerminalColorCodes.red + TerminalColorCodes.bold,
         r"\binfo\b": TerminalColorCodes.blue + TerminalColorCodes.bold,
-        r"\bwarn(ed|ing)?\b": TerminalColorCodes.yellow + TerminalColorCodes.bold,
+        r"\bwarn(?:ed|ing)?\b": TerminalColorCodes.yellow + TerminalColorCodes.bold,
         r'"[^"]*"': TerminalColorCodes.yellow,
         r"\*([^*]+)\*": TerminalColorCodes.italics,
         r"\*\*([^*]+)\*\*": TerminalColorCodes.bold,
