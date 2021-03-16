@@ -1,6 +1,7 @@
 import os
 import runpy
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 
 def get_version_from_pyfile(version_file="yacl.py"):
@@ -23,7 +24,8 @@ setup(
     name="yacl",
     version=version,
     py_modules=["yacl"],
-    python_requires="~=3.3",
+    python_requires="~=3.5",
+    extras_require={"colored_exceptions": ["pygments"]},
     author="Ingo Meyer",
     author_email="i.meyer@fz-juelich.de",
     description="YACL (Yet Another Color Logger) is a simple to use color logger for Python programs.",
@@ -41,12 +43,11 @@ setup(
         "Operating System :: POSIX :: Linux",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.3",
-        "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3 :: Only",
         "Topic :: Software Development",
         "Topic :: Utilities",

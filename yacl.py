@@ -3,13 +3,24 @@ import os
 import re
 import subprocess
 import sys
-from typing import Dict, Match, Optional, Tuple
+from traceback import format_exception
+from types import TracebackType
+from typing import Dict, Match, Optional, Tuple, Type
+
+try:
+    from pygments import highlight
+    from pygments.formatters import TerminalFormatter
+    from pygments.lexers import get_lexer_by_name
+
+    _pygments_available = True
+except ImportError:
+    _pygments_available = False
 
 __author__ = "Ingo Meyer"
 __email__ = "i.meyer@fz-juelich.de"
-__copyright__ = "Copyright © 2019 Forschungszentrum Jülich GmbH. All rights reserved."
+__copyright__ = "Copyright © 2021 Forschungszentrum Jülich GmbH. All rights reserved."
 __license__ = "MIT"
-__version_info__ = (0, 3, 5)
+__version_info__ = (0, 4, 0)
 __version__ = ".".join(map(str, __version_info__))
 
 
@@ -323,3 +334,15 @@ def setup_colored_stderr_logging(
     if remove_other_handlers:
         logger.handlers = []
     logger.addHandler(stream_handler)
+
+
+if _pygments_available:
+    def setup_colored_exceptions(dark_background: bool = False) -> None:
+        def excepthook(typ: Type[BaseException], value: BaseException, traceback: TracebackType) -> None:
+            traceback_text = "".join(format_exception(typ, value, traceback))
+            lexer = get_lexer_by_name("pytb", stripall=True)
+            formatter = TerminalFormatter(bg="dark" if dark_background else "light")
+            sys.stderr.write(highlight(traceback_text, lexer, formatter))
+            sys.stderr.flush()
+
+        sys.excepthook = excepthook

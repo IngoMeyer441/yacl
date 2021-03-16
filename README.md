@@ -148,3 +148,35 @@ You can pass several arguments to the `setup_colored_stderr_logging` function to
       "CRITICAL": TerminalColorCodes.red + TerminalColorCodes.blink + TerminalColorCodes.bold,
   }
   ```
+
+### Colored Exceptions
+
+If [Pygments](https://pypi.org/project/Pygments/) is installed, YACL exports an additonal function
+`setup_colored_exceptions` to generate colored exception tracebacks. You can force to install Pygments as a YACL
+dependency with the `colored_exceptions` extra:
+
+```bash
+python3 -m pip install 'yacl[colored_exceptions]'
+```
+
+The function `setup_colored_exceptions` needs to be called once (for example after `setup_colored_stderr_logging`) to
+install a custom [Python excepthook](https://docs.python.org/3/library/sys.html#sys.excepthook). It takes an optional
+bool parameter `dark_background` which can be set to `True` to activate brighter colors on dark terminal backgrounds. A
+full example is:
+
+```python
+#!/usr/bin/env python3
+
+import logging
+from yacl import setup_colored_exceptions, setup_colored_stderr_logging
+
+
+def main():
+    logging.basicConfig(level=logging.DEBUG)
+    setup_colored_stderr_logging()
+    setup_colored_exceptions()
+
+
+if __name__ == "__main__":
+    main()
+```
