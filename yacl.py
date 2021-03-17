@@ -20,7 +20,7 @@ __author__ = "Ingo Meyer"
 __email__ = "i.meyer@fz-juelich.de"
 __copyright__ = "Copyright © 2021 Forschungszentrum Jülich GmbH. All rights reserved."
 __license__ = "MIT"
-__version_info__ = (0, 4, 0)
+__version_info__ = (0, 4, 1)
 __version__ = ".".join(map(str, __version_info__))
 
 
@@ -345,4 +345,5 @@ if _pygments_available:
             sys.stderr.write(highlight(traceback_text, lexer, formatter))
             sys.stderr.flush()
 
-        sys.excepthook = excepthook
+        if TerminalColorCodes.has_terminal_color():
+            sys.excepthook = excepthook
