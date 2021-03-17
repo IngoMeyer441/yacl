@@ -345,4 +345,5 @@ if _pygments_available:
             sys.stderr.write(highlight(traceback_text, lexer, formatter))
             sys.stderr.flush()
 
-        sys.excepthook = excepthook
+        if TerminalColorCodes.has_terminal_color():
+            sys.excepthook = excepthook
