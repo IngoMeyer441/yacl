@@ -27,6 +27,26 @@ __version__ = ".".join(map(str, __version_info__))
 DEFAULT_FORMAT_STRING = "[%(levelname)s] (%(name)s:%(lineno)s:%(funcName)s): %(message)s"
 
 
+def is_env_variable_enabled(env_variable: str) -> bool:
+    if env_variable not in os.environ:
+        return False
+    value = os.environ[env_variable].strip().lower()
+    return value in ("on", "enabled", "activated", "yes") or (value.isdigit() and int(value) != 0)
+
+
+def is_env_variable_disabled(env_variable: str) -> bool:
+    if env_variable not in os.environ:
+        return False
+    value = os.environ[env_variable].strip().lower()
+    return value in ("off", "disabled", "deactivated", "no") or (value.isdigit() and int(value) == 0)
+
+
+def is_stderr_tty() -> bool:
+    return not is_env_variable_disabled("CLICOLOR") and (
+        is_env_variable_enabled("CLICOLOR_FORCE") or os.isatty(sys.stderr.fileno())
+    )
+
+
 class _TerminalColorCodesMeta(type):
     class InitializingTerminalCodesFailedError(Exception):
         pass
@@ -81,7 +101,7 @@ class _TerminalColorCodesMeta(type):
     def _init_terminal_codes(cls) -> None:
         if cls._initialized_terminal_codes:
             return
-        if not cls.is_stderr_tty():
+        if not is_stderr_tty():
             cls._codename_to_terminal_code = {key: "" for key in cls._codename_to_capname.keys()}
         else:
             has_terminal_color = cls.has_terminal_color()
@@ -102,12 +122,12 @@ class _TerminalColorCodesMeta(type):
             capname = codename
         return str(subprocess.check_output(["tput"] + capname.split(), universal_newlines=True))
 
-    def is_stderr_tty(cls) -> bool:
-        return os.isatty(sys.stderr.fileno())
-
     def has_terminal_color(cls) -> bool:
         try:
-            return cls.is_stderr_tty() and int(cls._query_terminfo_database("colors")) >= 8
+            return not is_env_variable_disabled("CLICOLOR") and (
+                is_env_variable_enabled("CLICOLOR_FORCE")
+                or (is_stderr_tty() and int(cls._query_terminfo_database("colors")) >= 8)
+            )
         except subprocess.CalledProcessError:
             return False
 
@@ -337,6 +357,7 @@ def setup_colored_stderr_logging(
 
 
 if _pygments_available:
+
     def setup_colored_exceptions(dark_background: bool = False) -> None:
         def excepthook(typ: Type[BaseException], value: BaseException, traceback: TracebackType) -> None:
             traceback_text = "".join(format_exception(typ, value, traceback))
