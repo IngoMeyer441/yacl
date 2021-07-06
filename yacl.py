@@ -20,7 +20,7 @@ __author__ = "Ingo Meyer"
 __email__ = "i.meyer@fz-juelich.de"
 __copyright__ = "Copyright © 2021 Forschungszentrum Jülich GmbH. All rights reserved."
 __license__ = "MIT"
-__version_info__ = (0, 4, 2)
+__version_info__ = (0, 4, 3)
 __version__ = ".".join(map(str, __version_info__))
 
 
@@ -303,10 +303,11 @@ class ColoredFormatter(logging.Formatter):
         level_colors: Optional[Dict[str, str]] = None,
     ):
         super().__init__(message_format)
+        cls = type(self)
         for attr in ("attribute_colors", "keyword_colors", "level_colors"):
-            setattr(self, attr, dict(getattr(self, "_" + attr)))
+            setattr(self, "_" + attr, dict(getattr(cls, "_" + attr)))
             if locals()[attr] is not None:
-                getattr(self, attr).update(locals()[attr])
+                getattr(self, "_" + attr).update(locals()[attr])
 
     def format(self, record: logging.LogRecord) -> str:
         def colorize_keyword(match_obj: Match[str]) -> str:
@@ -324,7 +325,7 @@ class ColoredFormatter(logging.Formatter):
             color, stripped_keyword = get_color_and_stripped_keyword(keyword)
             return "{}{}{}".format(color, stripped_keyword, TerminalColorCodes.reset)
 
-        for attr, color in self.attribute_colors.items():  # type: ignore
+        for attr, color in self._attribute_colors.items():
             if attr in ("levelname", "msg"):
                 continue
             setattr(record, attr, "{}{}{}".format(color, getattr(record, attr), TerminalColorCodes.reset))
