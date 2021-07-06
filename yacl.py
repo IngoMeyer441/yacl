@@ -324,7 +324,7 @@ class ColoredFormatter(logging.Formatter):
             color, stripped_keyword = get_color_and_stripped_keyword(keyword)
             return "{}{}{}".format(color, stripped_keyword, TerminalColorCodes.reset)
 
-        for attr, color in self.attribute_colors.items():
+        for attr, color in self.attribute_colors.items():  # type: ignore
             if attr in ("levelname", "msg"):
                 continue
             setattr(record, attr, "{}{}{}".format(color, getattr(record, attr), TerminalColorCodes.reset))

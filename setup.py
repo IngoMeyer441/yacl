@@ -1,15 +1,16 @@
 import os
 import runpy
+from typing import Optional, cast
 
-from setuptools import find_packages, setup
+from setuptools import setup
 
 
-def get_version_from_pyfile(version_file="yacl.py"):
+def get_version_from_pyfile(version_file: str = "yacl.py") -> str:
     file_globals = runpy.run_path(version_file)
-    return file_globals["__version__"]
+    return cast(str, file_globals["__version__"])
 
 
-def get_long_description_from_readme(readme_filename="README.md"):
+def get_long_description_from_readme(readme_filename: str = "README.md") -> Optional[str]:
     long_description = None
     if os.path.isfile(readme_filename):
         with open(readme_filename, "r", encoding="utf-8") as readme_file:

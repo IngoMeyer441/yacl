@@ -180,3 +180,15 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+
+## Contributing
+
+Please open [an issue on GitHub](https://github.com/IngoMeyer441/yacl/issues/new) if you experience bugs or miss
+features. Please consider to send a pull request if you can spend time on fixing the issue yourself. This project uses
+[pre-commit](https://pre-commit.com) to ensure code quality and a consistent code style. Run
+
+```bash
+make git-hooks-install
+```
+
+to install all linters as Git hooks in your local clone of `yacl`.
