@@ -1,5 +1,6 @@
 import logging
 import os
+import platform
 import re
 import subprocess
 import sys
@@ -45,6 +46,10 @@ def is_stderr_tty() -> bool:
     return not is_env_variable_disabled("CLICOLOR") and (
         is_env_variable_enabled("CLICOLOR_FORCE") or os.isatty(sys.stderr.fileno())
     )
+
+
+def is_stderr_supported_tty() -> bool:
+    return (platform.system() in ("Darwin", "Linux")) and is_stderr_tty()
 
 
 class _TerminalColorCodesMeta(type):
@@ -101,7 +106,7 @@ class _TerminalColorCodesMeta(type):
     def _init_terminal_codes(cls) -> None:
         if cls._initialized_terminal_codes:
             return
-        if not is_stderr_tty():
+        if not is_stderr_supported_tty():
             cls._codename_to_terminal_code = {key: "" for key in cls._codename_to_capname.keys()}
         else:
             has_terminal_color = cls.has_terminal_color()
@@ -126,7 +131,7 @@ class _TerminalColorCodesMeta(type):
         try:
             return not is_env_variable_disabled("CLICOLOR") and (
                 is_env_variable_enabled("CLICOLOR_FORCE")
-                or (is_stderr_tty() and int(cls._query_terminfo_database("colors")) >= 8)
+                or (is_stderr_supported_tty() and int(cls._query_terminfo_database("colors")) >= 8)
             )
         except subprocess.CalledProcessError:
             return False
