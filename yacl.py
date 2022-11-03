@@ -114,10 +114,7 @@ class _TerminalColorCodesMeta(type):
                 if codename in cls._color_names and not has_terminal_color:
                     cls._codename_to_terminal_code[codename] = ""
                 else:
-                    try:
-                        cls._codename_to_terminal_code[codename] = cls._query_terminfo_database(codename)
-                    except subprocess.CalledProcessError:
-                        cls._codename_to_terminal_code[codename] = ""
+                    cls._codename_to_terminal_code[codename] = cls._query_terminfo_database(codename)
         cls._initialized_terminal_codes = True
 
     def _query_terminfo_database(cls, codename: str) -> str:
@@ -125,13 +122,28 @@ class _TerminalColorCodesMeta(type):
             capname = cls._codename_to_capname[codename]
         else:
             capname = codename
-        return str(subprocess.check_output(["tput"] + capname.split(), universal_newlines=True))
+        try:
+            return subprocess.check_output(["tput"] + capname.split(), universal_newlines=True)
+        except FileNotFoundError:
+            # If `tput` is not installed, return an empty string, so no special terminal capabilities are used
+            # (text-only output mode)
+            return ""
+        except subprocess.CalledProcessError as e:
+            # The return code 1 indicates a missing terminal capability
+            if e.returncode == 1:
+                return ""
+            raise e
 
     def has_terminal_color(cls) -> bool:
+        def int_accept_empty_str(literal: str, base: int = 10) -> int:
+            if not literal.strip():
+                return 0
+            return int(literal, base)
+
         try:
             return not is_env_variable_disabled("CLICOLOR") and (
                 is_env_variable_enabled("CLICOLOR_FORCE")
-                or (is_stderr_supported_tty() and int(cls._query_terminfo_database("colors")) >= 8)
+                or (is_stderr_supported_tty() and int_accept_empty_str(cls._query_terminfo_database("colors")) >= 8)
             )
         except subprocess.CalledProcessError:
             return False
