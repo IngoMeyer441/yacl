@@ -6,7 +6,7 @@ import subprocess
 import sys
 from traceback import format_exception
 from types import TracebackType
-from typing import Dict, Match, Optional, Tuple, Type
+from typing import Any, Dict, Match, Optional, Tuple, Type
 
 try:
     from pygments import highlight
@@ -365,7 +365,7 @@ def setup_colored_stderr_logging(
 if _pygments_available:
 
     def setup_colored_exceptions(dark_background: bool = False) -> None:
-        def excepthook(typ: Type[BaseException], value: BaseException, traceback: TracebackType) -> None:
+        def excepthook(typ: Type[BaseException], value: BaseException, traceback: Optional[TracebackType]) -> Any:
             traceback_text = "".join(format_exception(typ, value, traceback))
             lexer = get_lexer_by_name("pytb", stripall=True)
             formatter = TerminalFormatter(bg="dark" if dark_background else "light")
