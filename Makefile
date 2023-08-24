@@ -1,4 +1,4 @@
-PRECOMMIT_VERSION = 2.20.0
+PRECOMMIT_VERSION = 3.3.3
 
 PRECOMMIT_ENV := $(shell git rev-parse --git-dir 2>/dev/null || echo ".")/.pre-commit_env
 

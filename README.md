@@ -11,6 +11,23 @@ You can use Markdown style formattings to produce bold and italic text. Addition
 underscores will be displayed underlined. YACL checks the terminal capabilities and automatically disables unsupported
 formats.
 
+## Breaking changes
+
+- From version 0.4.x to 0.5:
+
+  - Color codes are now applied **after** the logger created the final logging string with all placeholders replaced.
+
+    Example:
+
+    ```python
+    item_count = 3
+    logger.info("Found %d items.", item_count)
+    ```
+
+    Before version 0.5, color codes were applied to the string `"Found %d items"`. Now, color codes are added to the
+    final string `"Found 3 items"`. This requires the library user to rework custom `keyword_colors` dictionaries but is
+    more flexible for applying color rules.
+
 ## Installation
 
 YACL is available on PyPI for Python 3.3+ and can be installed with `pip`:

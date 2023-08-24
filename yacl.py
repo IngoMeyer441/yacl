@@ -19,9 +19,9 @@ except ImportError:
 
 __author__ = "Ingo Meyer"
 __email__ = "i.meyer@fz-juelich.de"
-__copyright__ = "Copyright © 2021 Forschungszentrum Jülich GmbH. All rights reserved."
+__copyright__ = "Copyright © 2023 Forschungszentrum Jülich GmbH. All rights reserved."
 __license__ = "MIT"
-__version_info__ = (0, 4, 5)
+__version_info__ = (0, 5, 0)
 __version__ = ".".join(map(str, __version_info__))
 
 
@@ -350,10 +350,12 @@ class ColoredFormatter(logging.Formatter):
             record.levelname = "{}{}{}".format(
                 self._level_colors[record.levelname], record.levelname, TerminalColorCodes.reset
             )
-        record.msg = re.sub(
-            r"({})".format("|".join(self._keyword_colors)), colorize_keyword, record.msg, flags=re.IGNORECASE
+        return re.sub(
+            r"({})".format("|".join(self._keyword_colors)),
+            colorize_keyword,
+            logging.Formatter.format(self, record),
+            flags=re.IGNORECASE,
         )
-        return logging.Formatter.format(self, record)
 
 
 def setup_colored_stderr_logging(
