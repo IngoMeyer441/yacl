@@ -350,10 +350,12 @@ class ColoredFormatter(logging.Formatter):
             record.levelname = "{}{}{}".format(
                 self._level_colors[record.levelname], record.levelname, TerminalColorCodes.reset
             )
-        record.msg = re.sub(
-            r"({})".format("|".join(self._keyword_colors)), colorize_keyword, record.msg, flags=re.IGNORECASE
+        return re.sub(
+            r"({})".format("|".join(self._keyword_colors)),
+            colorize_keyword,
+            logging.Formatter.format(self, record),
+            flags=re.IGNORECASE,
         )
-        return logging.Formatter.format(self, record)
 
 
 def setup_colored_stderr_logging(
