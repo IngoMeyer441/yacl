@@ -1,8 +1,8 @@
-default_stages: ['commit']
+default_stages: ['pre-commit']
 repos:
 # pre-commit repo:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.4.0
+  rev: v5.0.0
   hooks:
   # general hooks:
   - id: check-added-large-files  # Prevent giant files from being committed
@@ -22,14 +22,15 @@ repos:
   # Python specific hooks:
   - id: check-ast  # Simply check whether files parse as valid python
   - id: check-docstring-first  # Checks for a common error of placing code before the docstring
-  - id: debug-statements  # Check for debugger imports and py37+ `breakpoint()` calls in python source
+  # The `debug-statements` hook must be disabled for YACL since it uses the pdb API to start a post mortem debugger
+  # - id: debug-statements  # Check for debugger imports and py37+ `breakpoint()` calls in python source
   - id: fix-encoding-pragma  # Remove `# -*- coding: utf-8 -*-` from the top of python files
     args: ['--remove']
   - id: name-tests-test  # Assert that files in tests/ end in `_test.py`
   - id: requirements-txt-fixer  # Sorts entries in requirements.txt and removes incorrect entry `pkg-resources==0.0.0`
 # General repos:
 - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
-  rev: 2.7.2
+  rev: 3.0.3
   hooks:
   - id: editorconfig-checker
     exclude_types: [markdown]
@@ -47,18 +48,18 @@ repos:
       '--msg-filename',
     ]
 - repo: https://github.com/igorshubovych/markdownlint-cli
-  rev: v0.35.0
+  rev: v0.42.0
   hooks:
   - id: markdownlint
 - repo: https://github.com/adrienverge/yamllint
-  rev: v1.32.0
+  rev: v1.35.1
   hooks:
   - id: yamllint
     args: [
       '--config-data={extends: default, rules: {indentation: {indent-sequences: consistent}, line-length: {max: 120}}}'
     ]
 - repo: https://github.com/sirosen/check-jsonschema
-  rev: 0.24.1
+  rev: 0.29.4
   hooks:
   - id: check-jsonschema
     name: 'Validate GitLab CI configuration'
@@ -68,17 +69,21 @@ repos:
       'https://gitlab.com/gitlab-org/gitlab/-/raw/master/app/assets/javascripts/editor/schema/ci.json',
     ]
 - repo: https://github.com/sirosen/check-jsonschema
-  rev: 0.24.1
+  rev: 0.29.4
   hooks:
   - id: check-github-workflows
 # Python specific repos:
+- repo: https://github.com/rstcheck/rstcheck
+  rev: v6.2.4
+  hooks:
+  - id: rstcheck
 - repo: https://github.com/psf/black
-  rev: 23.7.0
+  rev: 24.10.0
   hooks:
   - id: black
     args: ['--line-length=120']
 - repo: https://github.com/PyCQA/isort
-  rev: 5.12.0
+  rev: 5.13.2
   hooks:
   - id: isort
     args: [  # Arguments for `black` compatibility
@@ -90,7 +95,7 @@ repos:
       '--ensure-newline-before-comments',
     ]
 - repo: https://github.com/pycqa/flake8
-  rev: 6.1.0
+  rev: 7.1.1
   hooks:
   - id: flake8
     args: [
@@ -98,7 +103,7 @@ repos:
       '--ignore=E203,W503',  # Otherwise, `flake8` is not compatible with `black`
     ]
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.5.1
+  rev: v1.13.0
   hooks:
   - id: mypy
     args: ['--ignore-missing-imports', '--strict']
