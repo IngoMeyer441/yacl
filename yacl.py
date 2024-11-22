@@ -21,8 +21,14 @@ __author__ = "Ingo Meyer"
 __email__ = "i.meyer@fz-juelich.de"
 __copyright__ = "Copyright © 2023 Forschungszentrum Jülich GmbH. All rights reserved."
 __license__ = "MIT"
-__version_info__ = (0, 5, 0)
+__version_info__ = (0, 6, 0)
 __version__ = ".".join(map(str, __version_info__))
+
+__all__ = [
+    "setup_colored_exceptions",
+    "setup_colored_stderr_logging",
+    "setup_pdb_debugging",
+]
 
 
 DEFAULT_FORMAT_STRING = "[%(levelname)s] (%(name)s:%(lineno)s:%(funcName)s): %(message)s"
@@ -32,24 +38,28 @@ def is_env_variable_enabled(env_variable: str) -> bool:
     if env_variable not in os.environ:
         return False
     value = os.environ[env_variable].strip().lower()
-    return value in ("on", "enabled", "activated", "yes") or (value.isdigit() and int(value) != 0)
+    return value in ("on", "enabled", "activated", "yes", "true") or (value.isdigit() and int(value) != 0)
 
 
 def is_env_variable_disabled(env_variable: str) -> bool:
     if env_variable not in os.environ:
         return False
     value = os.environ[env_variable].strip().lower()
-    return value in ("off", "disabled", "deactivated", "no") or (value.isdigit() and int(value) == 0)
+    return value in ("off", "disabled", "deactivated", "no", "false") or (value.isdigit() and int(value) == 0)
 
 
-def is_stderr_tty() -> bool:
+def is_stderr_colored_tty() -> bool:
     return not is_env_variable_disabled("CLICOLOR") and (
-        is_env_variable_enabled("CLICOLOR_FORCE") or os.isatty(sys.stderr.fileno())
+        is_env_variable_enabled("CLICOLOR_FORCE") or sys.stderr.isatty()
     )
 
 
 def is_stderr_supported_tty() -> bool:
-    return (platform.system() in ("Darwin", "Linux")) and is_stderr_tty()
+    return (platform.system() in ("Darwin", "Linux")) and is_stderr_colored_tty()
+
+
+def is_repl_active() -> bool:
+    return hasattr(sys, "ps1")
 
 
 class _TerminalColorCodesMeta(type):
@@ -376,15 +386,104 @@ def setup_colored_stderr_logging(
     logger.addHandler(stream_handler)
 
 
-if _pygments_available:
+class _YaclExceptHook:
+    def __init__(
+        self,
+        enable_colored_traceback: bool = False,
+        enable_pdb: bool = False,
+        dark_background: bool = False,
+    ) -> None:
+        self._enable_colored_traceback = enable_colored_traceback and _pygments_available
+        self._enable_pdb = enable_pdb
+        self._dark_background = dark_background
 
-    def setup_colored_exceptions(dark_background: bool = False) -> None:
-        def excepthook(typ: Type[BaseException], value: BaseException, traceback: Optional[TracebackType]) -> Any:
-            traceback_text = "".join(format_exception(typ, value, traceback))
+    def __call__(self, typ: Type[BaseException], value: BaseException, tb: Optional[TracebackType]) -> Any:
+        def print_colored_traceback() -> None:
+            traceback_text = "".join(format_exception(typ, value, tb))
             lexer = get_lexer_by_name("pytb", stripall=True)
-            formatter = TerminalFormatter(bg="dark" if dark_background else "light")
-            sys.stderr.write(highlight(traceback_text, lexer, formatter))
-            sys.stderr.flush()
+            formatter = TerminalFormatter(bg="dark" if self._dark_background else "light")
+            print(highlight(traceback_text, lexer, formatter), file=sys.stderr, flush=True, end="")
 
-        if TerminalColorCodes.has_terminal_color():
-            sys.excepthook = excepthook
+        def start_pdb() -> None:
+            import pdb
+
+            pdb.post_mortem(tb)
+
+        from bdb import BdbQuit
+
+        if typ is BdbQuit:
+            return
+
+        if self._enable_colored_traceback:
+            print_colored_traceback()
+        else:
+            sys.__excepthook__(typ, value, tb)
+
+        if self._enable_pdb:
+            print(file=sys.stderr)  # Insert a newline
+            start_pdb()
+
+    @property
+    def enable_colored_traceback(self) -> bool:
+        return self._enable_colored_traceback
+
+    @enable_colored_traceback.setter
+    def enable_colored_traceback(self, enable_colored_traceback: bool) -> None:
+        self._enable_colored_traceback = enable_colored_traceback and _pygments_available
+
+    @property
+    def enable_pdb(self) -> bool:
+        return self._enable_pdb
+
+    @enable_pdb.setter
+    def enable_pdb(self, enable_pdb: bool) -> None:
+        self._enable_pdb = enable_pdb
+
+    @property
+    def dark_background(self) -> bool:
+        return self._dark_background
+
+    @dark_background.setter
+    def dark_background(self, dark_background: bool) -> None:
+        self._dark_background = dark_background
+
+
+_yacl_excepthook: Optional[_YaclExceptHook] = None
+
+
+def setup_colored_exceptions(dark_background: bool = False) -> None:
+    global _yacl_excepthook
+
+    # Python 3.13 has built-in support for colored exceptions
+    if (sys.version_info.major, sys.version_info.minor) >= (3, 13) or not TerminalColorCodes.has_terminal_color():
+        return
+
+    if not _pygments_available:
+        raise ImportError("Pygments is not available")
+
+    if _yacl_excepthook is None:
+        _yacl_excepthook = _YaclExceptHook(enable_colored_traceback=True, dark_background=dark_background)
+    else:
+        _yacl_excepthook.enable_colored_traceback = True
+
+    sys.excepthook = _yacl_excepthook
+
+
+def setup_pdb_debugging() -> None:
+    global _yacl_excepthook
+
+    if is_repl_active() or not sys.stderr.isatty():
+        return
+
+    if _yacl_excepthook is None:
+        _yacl_excepthook = _YaclExceptHook(enable_pdb=True)
+    else:
+        _yacl_excepthook.enable_pdb = True
+
+    sys.excepthook = _yacl_excepthook
+
+
+if _pygments_available and is_env_variable_enabled("YACL_ENABLE_COLORED_EXCEPTIONS"):
+    setup_colored_exceptions(dark_background=is_env_variable_enabled("YACL_DARK_BACKGROUND"))
+if is_env_variable_enabled("YACL_ENABLE_PDB"):
+    setup_pdb_debugging()

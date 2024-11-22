@@ -11,7 +11,15 @@ You can use Markdown style formattings to produce bold and italic text. Addition
 underscores will be displayed underlined. YACL checks the terminal capabilities and automatically disables unsupported
 formats.
 
+Additionally, YACL can enable a custom global except hook to colorize Python exceptions tracebacks and automatically
+start PDB in post mortem mode (so you don't need to run your script with `python -m pdb` explicitly).
+
 ## Breaking changes
+
+- From version 0.5.x to 0.6:
+
+  - The function `setup_colored_exceptions` is now always available, regardless if Pygments is installed or not.
+    However, it will raise an `ImportError` is Pygments cannot be imported.
 
 - From version 0.4.x to 0.5:
 
@@ -30,7 +38,7 @@ formats.
 
 ## Installation
 
-YACL is available on PyPI for Python 3.3+ and can be installed with `pip`:
+YACL is available on PyPI for Python 3.9+ and can be installed with `pip`:
 
 ```bash
 python3 -m pip install yacl
@@ -168,9 +176,8 @@ You can pass several arguments to the `setup_colored_stderr_logging` function to
 
 ### Colored Exceptions
 
-If [Pygments](https://pypi.org/project/Pygments/) is installed, YACL exports an additonal function
-`setup_colored_exceptions` to generate colored exception tracebacks. You can force to install Pygments as a YACL
-dependency with the `colored_exceptions` extra:
+If [Pygments](https://pypi.org/project/Pygments/) is installed, YACL can generate colored exception tracebacks. You can
+force to install Pygments as a YACL dependency with the `colored_exceptions` extra:
 
 ```bash
 python3 -m pip install 'yacl[colored_exceptions]'
@@ -197,6 +204,46 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+
+Set the environment variable `YACL_ENABLE_COLORED_EXCEPTIONS` to `1` to always enable colored exceptions on `yacl`
+import. With this activation mode, `YACL_DARK_BACKGROUND` can be used to control the color scheme.
+
+**Note:** Starting from Python 3.13, Python has [built-in support for colored exception
+tracebacks](https://docs.python.org/3/whatsnew/3.13.html#improved-error-messages). Running `setup_colored_exceptions` on
+Python 3.13 or newer has no effect.
+
+### PDB post mortem hook
+
+Run `setup_pdb_debugging` to install a PDB post mortem hook. If your program crashes and is run in a terminal window,
+you will be dropped into the PDB shell. This allows you to analyze the program state which led to the crash.
+
+Set the environment variable `YACL_ENABLE_PDB` to `1` to always enable PDB post mortem debugging on `yacl` import.
+
+### Enable colored exceptions and PDB post mortem mode without source code modification
+
+If you would like to use YACL's colored exceptions and / or PDB post mortem debugging without adding it to your
+project's source code, you can add it to the startup script of your virtual environment. For this, define an
+`enable-yacl` function in your shell's startup file (`~/.bashrc` or `~/.zshrc`):
+
+```bash
+enable-yacl () {
+    local site_packages_directory
+
+    if [[ -z "${VIRTUAL_ENV}" ]]; then
+        >&2 echo "Please activate a virtual environment first."
+        return 1
+    fi
+
+    pip install 'yacl[colored_exceptions]' 'git+https://github.com/pdbpp/pdbpp.git' && \
+    site_packages_directory="$(python -c 'import site; print(site.getsitepackages()[0])')" && \
+    echo 'import yacl' >"${site_packages_directory}/sitecustomize.py"
+}
+```
+
+Run `enable-yacl` to install YACL and [pdb++](https://github.com/pdbpp/pdbpp) into the currently activated virtual
+environment and load `yacl` on interpreter startup. Now, you can use the environment variables
+`YACL_ENABLE_COLORED_EXCEPTIONS` and `YACL_ENABLE_PDB` (see the explanations in the previous sections) to control the
+behavior of YACL.
 
 ## Contributing
 

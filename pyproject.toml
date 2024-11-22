@@ -1,0 +1,48 @@
+[project]
+name = "yacl"
+description = "YACL (Yet Another Color Logger) is a simple to use color logger for Python programs."
+readme = "README.md"
+requires-python = ">=3.9"
+license = {file = "LICENSE"}
+keywords = ["utility", "logging", "color"]
+authors = [
+    {name = "Ingo Meyer", email = "i.meyer@fz-juelich.de" }
+]
+maintainers = [
+    {name = "Ingo Meyer", email = "i.meyer@fz-juelich.de" }
+]
+classifiers=[
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "numpy"
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+colored_exceptions = ["pygments"]
+
+[project.urls]
+"Homepage" = "https://github.com/IngoMeyer441/yacl"
+
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+version = {attr = "yacl.__version__"}
