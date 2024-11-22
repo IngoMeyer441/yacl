@@ -57,16 +57,15 @@ deploy-to-pypi:
   only:
   - tags@imeyer/yacl
   script:
-  - pip install twine
   - echo "[distutils]"                    > ~/.pypirc;
     echo "index-servers ="               >> ~/.pypirc;
     echo "    pypi"                      >> ~/.pypirc;
     echo "[pypi]"                        >> ~/.pypirc;
     echo "username = __token__"          >> ~/.pypirc;
     echo "password = ${PYPI_DEPLOY_KEY}" >> ~/.pypirc;
-  - python setup.py sdist
-  - python setup.py bdist_wheel
-  - twine upload dist/*
+  - pip install build twine
+  - python -m build
+  - python -m twine upload dist/*
 
 deploy-to-aur:
   stage: deploy-to-aur
