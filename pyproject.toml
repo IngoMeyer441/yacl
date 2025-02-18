@@ -29,9 +29,7 @@ classifiers=[
     "Topic :: Software Development",
     "Topic :: Utilities",
 ]
-dependencies = [
-    "numpy"
-]
+dependencies = []
 dynamic = ["version"]
 
 [project.optional-dependencies]
